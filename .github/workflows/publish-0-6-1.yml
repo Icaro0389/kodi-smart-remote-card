@@ -1,0 +1,21 @@
+name: Publish Kodi Smart Remote v0.6.1
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-0-6-1.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view 'v0.6.1' >/dev/null 2>&1 && exit 0
+          gh release create 'v0.6.1' --target "${GITHUB_SHA}" --title 'Kodi Smart Remote v0.6.1' --notes 'Moves favourites button beside D-pad and adds trash removal icon with confirmation. Requires backend and integration v0.2.1.' --latest
