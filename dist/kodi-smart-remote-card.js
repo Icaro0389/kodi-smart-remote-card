@@ -101,7 +101,11 @@ button[data-action="Input.Select"]{box-shadow:0 0 0 1px #4ae3fa22,inset 0 1px 8p
     if(nonce!==b.nonce)return;
     if(data.error)throw Error(data.error);
     b.items=Array.isArray(data.items)?data.items:[];b.total=Number(data.total)||0;
-     if(b.section==='favourites'&&!b.itemId&&term){b.items=b.items.filter(x=>(x.title||'').toLocaleLowerCase().includes(term.toLocaleLowerCase()));b.total=b.items.length;}
+     if(b.section==='favourites'&&!b.itemId){
+       if(term)b.items=b.items.filter(x=>(x.title||'').toLocaleLowerCase().includes(term.toLocaleLowerCase()));
+       b.total=b.items.length;
+       b.items=b.items.slice(b.page*b.pageSize,(b.page+1)*b.pageSize);
+     }
     if(!b.itemId&&['tv','radio'].includes(b.section)){b.groups=Array.isArray(data.groups)?data.groups:[];this._drawGroups();}
     b.indexing=!!data.indexing;
     if(globalSearch){
