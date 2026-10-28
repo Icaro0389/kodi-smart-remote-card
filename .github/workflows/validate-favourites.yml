@@ -1,7 +1,7 @@
 name: Validate favourite remote
 on:
   push:
-    branches: [fix/subtitles-button-width]
+    branches: [fix/favourites-side-of-dpad]
   pull_request:
 jobs:
   syntax:
