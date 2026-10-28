@@ -26,7 +26,7 @@ The HACS resource URL is typically:
 
 ```yaml
 type: custom:kodi-smart-remote
-entity: media_player.192_168_178_88
+entity: media_player.kodi
 mode_entity: sensor.modalita_hdmi
 update_interval: 4
 ```
