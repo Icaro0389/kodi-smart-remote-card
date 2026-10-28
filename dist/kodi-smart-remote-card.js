@@ -94,7 +94,7 @@ button[data-action="Input.Select"]{box-shadow:0 0 0 1px #4ae3fa22,inset 0 1px 8p
   const request=b.section==='favourites'&&!b.itemId ? {type:'kodi_smart_bridge/favourites'} : {type:'kodi_smart_bridge/browse',page:b.page,page_size:b.pageSize};
   if(globalSearch){request.root=b.section==='movies'?'film':'series';request.search=term;}
   else if(b.itemId)request.item_id=b.itemId;
-  else request.root=b.section==='movies'?'film':b.section;
+  else if(b.section!=='favourites')request.root=b.section==='movies'?'film':b.section;
   if(['tv','radio'].includes(b.section)){if(b.group)request.group=b.group;if(term)request.search=term;}
   try{
     const data=await this._hass.callWS(request);
