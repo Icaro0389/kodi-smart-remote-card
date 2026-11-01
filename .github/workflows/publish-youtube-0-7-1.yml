@@ -1,0 +1,17 @@
+name: Publish Kodi Remote v0.7.1
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-youtube-0-7-1.yml'
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish fix
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create v0.7.1 --target "${GITHUB_SHA}" --title "v0.7.1 — YouTube icon fix" --notes "Make YouTube a compact icon-only button next to the D-pad. Prevents the label overflowing on desktop and mobile. No change to search or playback."
