@@ -87,7 +87,7 @@ button[data-action="Input.Select"]{box-shadow:0 0 0 1px #4ae3fa22,inset 0 1px 8p
   const b=this._browser;if(b.section==='remote')return;
   if(b.indexTimer){clearTimeout(b.indexTimer);b.indexTimer=null;}
   const nonce=++b.nonce;b.busy=true;
-  const term=b.query.trim().slice(0,100),library=['movies','series','youtube'].includes(b.section);
+  const term=b.query.trim().slice(0,100),library=['movies','series'].includes(b.section);
   const globalSearch=library&&term.length>=2;
   const index=this._el('browser-index');index.hidden=true;
   if(library&&term.length===1){b.items=[];b.total=0;b.busy=false;this._drawBrowser('Digita almeno 2 caratteri per cercare in tutto il catalogo');return;}
@@ -103,7 +103,7 @@ button[data-action="Input.Select"]{box-shadow:0 0 0 1px #4ae3fa22,inset 0 1px 8p
     if(nonce!==b.nonce)return;
     if(data.error)throw Error(data.error);
     b.items=Array.isArray(data.items)?data.items:[];b.total=Number(data.total)||0;
-    if(b.section==='youtube'&&!data.configured){this._drawBrowser('YouTube: configura la API key nelle opzioni Kodi Smart Bridge');return;}
+    if(b.section==='youtube'&&!data.configured){b.items=[];b.total=0;this._drawBrowser('YouTube: configura la API key nelle opzioni Kodi Smart Bridge');return;}
      if(b.section==='favourites'&&!b.itemId){
        if(term)b.items=b.items.filter(x=>(x.title||'').toLocaleLowerCase().includes(term.toLocaleLowerCase()));
        b.total=b.items.length;
@@ -111,7 +111,7 @@ button[data-action="Input.Select"]{box-shadow:0 0 0 1px #4ae3fa22,inset 0 1px 8p
      }
     if(!b.itemId&&['tv','radio'].includes(b.section)){b.groups=Array.isArray(data.groups)?data.groups:[];this._drawGroups();}
     b.indexing=!!data.indexing;
-    if(globalSearch){
+    if(globalSearch&&b.section!=='youtube'){
       index.hidden=!b.indexing;
       if(b.indexing){
         index.textContent=`Indicizzazione SmartVOD in corso: ${data.scanned_categories||0}/${data.total_categories||'?'} categorie. Risultati provvisori: ${b.total}.`;
@@ -126,7 +126,7 @@ button[data-action="Input.Select"]{box-shadow:0 0 0 1px #4ae3fa22,inset 0 1px 8p
  }
 
  _drawGroups(){const b=this._browser,select=this._el('browser-group');select.replaceChildren();const visible=['tv','radio'].includes(b.section)&&!b.itemId&&b.groups.length>0;select.hidden=!visible;if(!visible)return;const add=(value,label)=>{const opt=document.createElement('option');opt.value=value;opt.textContent=label;select.append(opt);};add('','Tutte le categorie');for(const g of b.groups)add(g.title,`${g.title} (${g.count})`);select.value=b.group;}
- _updatePager(){const b=this._browser;this._el('browser-count').textContent=b.total?`${b.page*b.pageSize+1}–${Math.min((b.page+1)*b.pageSize,b.total)} / ${b.total}`:'0 elementi';this._el('browser-prev').disabled=b.busy||b.page===0;this._el('browser-next').disabled=b.busy||(b.page+1)*b.pageSize>=b.total;}
+ _updatePager(){const b=this._browser;this._el('browser-count').textContent=b.total?`${b.page*b.pageSize+1}–${Math.min((b.page+1)*b.pageSize,b.total)} / ${b.total}`:'0 elementi';this._el('browser-prev').disabled=b.section==='youtube'||b.busy||b.page===0;this._el('browser-next').disabled=b.section==='youtube'||b.busy||(b.page+1)*b.pageSize>=b.total;}
  _drawBrowser(message='',error=false){if(!this._rendered)return;const b=this._browser;this._el('browser-title').textContent=b.title||({movies:'SmartVOD',tv:'Live TV',series:'Serie TV',radio:'Radio',favourites:'Preferiti Kodi'}[b.section]||'Catalogo');const list=this._el('browser-list');list.replaceChildren();if(message){const el=document.createElement('div');el.className='browser-message'+(error?' error':'');el.textContent=message;list.append(el);}else{const matches=b.items.map((item,index)=>({item,index}));for(const {item,index} of matches){const row=document.createElement('button');row.type='button';row.className='media-entry';const url=this._safeImage(item.poster);if(url){const im=document.createElement('img');im.src=url;im.loading='lazy';im.alt='';row.append(im);}const details=document.createElement('div');details.className='details';const label=document.createElement('div');label.className='entry-name';label.textContent=this._cleanLabel(item.title);const kind=document.createElement('div');kind.className='entry-kind';kind.textContent=item.type==='directory'?'Apri categoria ›':`▶ Riproduci su Kodi${item.group?' · '+item.group:''}`;details.append(label,kind);row.append(details);row.addEventListener('click',()=>this._selectItem(index));if(['movies','series','favourites'].includes(b.section)){const fav=document.createElement('button');fav.type='button';fav.className='ksr-fav'+(b.section==='favourites'?' ksr-remove':'');fav.textContent=b.section==='favourites'?'🗑':(item.favourite?'★':'☆');fav.title=item.favourite?'Rimuovi dai preferiti Kodi':'Aggiungi ai preferiti Kodi';fav.setAttribute('aria-label',fav.title);fav.disabled=false;fav.addEventListener('click',e=>{e.stopPropagation();this._toggleFavourite(item,fav);});const play=document.createElement('button');play.type='button';play.className='ksr-play';play.textContent=item.type==='directory'?'›':'▶';play.title=item.type==='directory'?'Apri stagioni':'Riproduci su Kodi';play.setAttribute('aria-label',play.title);play.addEventListener('click',e=>{e.stopPropagation();this._selectItem(index);});const wrap=document.createElement('div');wrap.className='ksr-media-line';wrap.append(row,play,fav);list.append(wrap);}else list.append(row);}if(!matches.length){const empty=document.createElement('div');empty.className='browser-message';empty.textContent='Nessun elemento in questa pagina';list.append(empty);}}this._updatePager();}
  async _selectItem(index){const b=this._browser,item=b.items[index];if(!item||!item.id||b.busy)return;if(item.type==='directory'){b.stack.push({itemId:b.itemId,title:b.title,page:b.page,query:b.query});b.itemId=item.id;b.title=this._cleanLabel(item.title);b.page=0;b.query='';this._el('browser-search').value='';this._el('browser-index').hidden=true;this._drawGroups();this._loadBrowser();return;}try{this._feedback('Avvio '+this._cleanLabel(item.title)+'…');const result=await this._hass.callWS({type:'kodi_smart_bridge/play',item_id:item.id});if(!result?.ok)throw Error('Kodi non ha confermato il comando');this._feedback('Riproduzione inviata: '+this._cleanLabel(item.title));}catch(e){this._feedback('Riproduzione: '+(e.message||String(e)),true);}}
  async _toggleFavourite(item,button){
