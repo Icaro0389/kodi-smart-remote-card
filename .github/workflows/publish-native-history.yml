@@ -1,0 +1,17 @@
+name: Publish native YouTube history v0.7.2
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-native-history.yml'
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish stable v0.7.2
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create v0.7.2 --target "${GITHUB_SHA}" --title "Kodi Smart Remote v0.7.2" --notes "YouTube Cerca/Cronologia tabs, native Kodi history, thumbnails, paginated browsing and one-click playback. Requires Bridge App and integration v0.3.1." --latest
