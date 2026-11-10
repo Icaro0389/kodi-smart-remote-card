@@ -56,7 +56,7 @@ button[data-action="Input.Select"]{box-shadow:0 0 0 1px #4ae3fa22,inset 0 1px 8p
 @media(prefers-reduced-motion:reduce){button{transition:none!important}}
  </style>
  <ha-card><div class="art-bg" id="bg"></div><div class="content">
- <div class="head"><div class="name">◈ Kodi Remote <span>v0.7.0</span></div><span class="status" id="connection">● Collegamento…</span></div>
+ <div class="head"><div class="name">◈ Kodi Remote <span>v0.7.2</span></div><span class="status" id="connection">● Collegamento…</span></div>
  <div class="now"><img class="art" id="art" alt="Copertina in riproduzione"><div class="nowtxt"><div class="title" id="title">Kodi</div><div class="subtitle" id="gui">Telecomando · Media Browser</div></div></div>
  <div class="section-tabs" id="section-tabs">${b('section:remote','Remote','active')}${b('section:tv','TV')}${b('section:movies','Film')}${b('section:series','Serie')}${b('section:radio','Radio')}</div>
  <div class="remote-view" id="remote-view"><div class="modes" id="modes">${b('mode:kodi','Kodi')}${b('mode:moonlight','Moonlight')}${b('mode:retro','Retro')}${b('mode:off','Off')}</div>
