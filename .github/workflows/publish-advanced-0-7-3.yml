@@ -1,0 +1,17 @@
+name: Publish Kodi Smart Remote v0.7.3
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-advanced-0-7-3.yml'
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish v0.7.3
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create v0.7.3 --target "${GITHUB_SHA}" --title "Kodi Smart Remote v0.7.3 — Advanced Controls" --notes "Adds 77 categorized Kodi actions under Gesture e controlli extra, including playerdebug, playerprocessinfo, codecinfo, screenshot, video/audio/PVR/navigation controls, custom action IDs and advanced JSON-RPC method + JSON params. Frontend-only; no backend update needed." --latest
